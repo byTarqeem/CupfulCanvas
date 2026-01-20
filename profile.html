@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>الملف الشخصي</title>
+
+
+
+
+<style>
+       :root {
+  --primary: #4b2e21;
+  --secondary: #8b5a3c;
+  --accent: #d4a373;
+  --bg-light: #faf3e0;
+  --white: #ffffff;
+  --glass: rgba(255, 255, 255, 0.8);
+  --transition: all 0.3s ease;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Cairo', sans-serif; }
+
+body { background: var(--bg-light); color: var(--primary); line-height: 1.6; }
+
+/* الهيدر الموحد */
+header {
+  padding: 15px 5%; display: flex; justify-content: space-between; align-items: center;
+  background: var(--glass); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 1000;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.logo { font-size: 24px; font-weight: bold; color: var(--primary); text-decoration: none; }
+
+.nav-links a { margin-left: 20px; text-decoration: none; color: var(--primary); font-weight: 600; }
+
+/* الأزرار الموحدة */
+.btn {
+  padding: 12px 25px; border-radius: 25px; border: none; cursor: pointer;
+  transition: var(--transition); text-decoration: none; display: inline-block; font-weight: 600;
+}
+.btn-primary { background: var(--primary); color: white; }
+.btn-primary:hover { background: var(--secondary); transform: translateY(-2px); }
+
+/* الحاويات */
+.container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+
+/* الفورم (للنماذج) */
+.form-card {
+  background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  max-width: 400px; margin: 50px auto; text-align: center;
+}
+.form-group { margin-bottom: 20px; text-align: right; }
+.form-group input {
+  width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; outline: none;
+}
+
+/* بطاقات المنتجات */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 30px; }
+.card { background: white; padding: 20px; border-radius: 20px; text-align: center; transition: var(--transition); }
+.card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
+
+    </style>
+</head>
+<body>
+    <div class="container" style="display:flex; gap:30px">
+        <div style="flex:1; background:white; padding:30px; border-radius:20px; text-align:center">
+            <img src="https://cdn-icons-png.flaticon.com" style="width:100px">
+            <h2>أحمد محمد</h2>
+            <p>ahmed@example.com</p>
+            <hr style="margin:20px 0">
+            <nav style="display:flex; flex-direction:column; gap:10px; text-align:right">
+                <a href="#">طلباتي السابقة</a>
+                <a href="#">العناوين المسجلة</a>
+                <a href="index.html" style="color:red">تسجيل الخروج</a>
+            </nav>
+        </div>
+        <div style="flex:2; background:white; padding:30px; border-radius:20px">
+            <h3>آخر الطلبات</h3>
+            <p style="margin-top:20px; color:gray">لا توجد طلبات سابقة حالياً.</p>
+        </div>
+    </div>
+</body>
+</html>

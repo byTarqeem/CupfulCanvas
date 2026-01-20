@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إتمام الطلب | CupfulCanvas</title>
+    <!-- ربط الخطوط من جوجل -->
+    <link href="https://fonts.googleapis.com" rel="stylesheet">
+    <!-- الأنماط الأساسية المضمنة -->
+    <style>
+        /* تعريف المتغيرات الأساسية (نفس المستخدمة في الصفحات الأخرى) */
+        :root {
+            --primary: #6f4e37; /* لون القهوة البني */
+            --secondary: #ff7e5f; /* لون برتقالي حيوي */
+            --text-color: #333;
+            --bg-color: #f8f8f2;
+            --card-bg: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+	    font-family: 'Cairo', sans-serif;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* تنسيق الهيدر */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #eee;
+            background-color: var(--card-bg);
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        /* تنسيق الأزرار (نفس المنيو والسلة) */
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        /* تنسيق بطاقة النموذج (Checkout Form) */
+        .form-card {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 15px;
+            margin: 40px auto;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .form-group input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-sizing: border-box; /* مهم جداً للحفاظ على العرض 100% مع البادينغ */
+            font-family: 'Cairo', sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <header class="container">
+        <a href="index.html" class="logo">CupfulCanvas</a>
+        <nav>
+            <a href="cart.html">العودة للسلة</a>
+        </nav>
+    </header>
+
+    <div class="form-card" style="max-width:500px">
+        <h2 style="color:var(--primary)">📋 تأكيد الفاتورة</h2>
+        <p style="margin-bottom:20px; color:gray">سيتم تحويلك لتطبيق الواتساب لإرسال الطلب</p>
+
+        <form id="orderForm" onsubmit="sendToWhatsApp(event)">
+            <div class="form-group">
+                <label>اسم العميل (حروف فقط)</label>
+                <input type="text" id="customer-name" 
+                       placeholder="أدخل اسمك الكامل" 
+                       required 
+                       oninput="this.value = this.value.replace(/[0-9]/g, '')">
+            </div>
+
+            <div class="form-group">
+                <label>رقم الطاولة / العنوان</label>
+                <input type="text" id="customer-address" placeholder="مثلاً: طاولة رقم 5 أو الحي والشارع" required>
+            </div>
+
+            <!-- ملخص سريع للفاتورة -->
+            <div id="order-summary" style="background:#f9f9f9; padding:15px; border-radius:10px; margin-bottom:20px; text-align:right; font-size:14px">
+                <!-- سيظهر الملخص هنا عبر JS -->
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width:100%; background:#25D366; border:none;">
+                 إرسال الطلب عبر WhatsApp 📱
+            </button>
+        </form>
+    </div>
+
+    <script>
+        // دالة لعرض ملخص السلة عند تحميل الصفحة
+        function loadSummary() {
+            // نستخدم مفتاح التخزين الصحيح: cupfulCanvasCart
+            const cart = JSON.parse(localStorage.getItem('cupfulCanvasCart')) || []; 
+            const summaryDiv = document.getElementById('order-summary');
+
+            if(cart.length === 0) {
+                summaryDiv.innerHTML = "السلة فارغة! يرجى إضافة منتجات أولاً.";
+                return;
+            }
+            
+            let total = 0;
+            // حساب المجموع بشكل صحيح مع الأخذ بالاعتبار الكمية
+            cart.forEach(item => {
+                total += item.price * item.quantity;
+            });
+
+            summaryDiv.innerHTML = `
+                <strong>عدد الأصناف:</strong> ${cart.length} <br> 
+                <strong>المجموع النهائي:</strong> ${total.toFixed(2)} OMR
+            `;
+        }
+
+        function sendToWhatsApp(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('customer-name').value;
+            const address = document.getElementById('customer-address').value;
+            // نستخدم مفتاح التخزين الصحيح: cupfulCanvasCart
+            const cart = JSON.parse(localStorage.getItem('cupfulCanvasCart')) || []; 
+
+            if (cart.length === 0) {
+                alert("سلتك فارغة، لا يوجد طلب لإرساله!");
+                return;
+            }
+
+            // --- تنسيق الفاتورة ---
+            // إنشاء رسالة واتساب مفصلة
+            const orderNumber = Math.floor(100000 + Math.random() * 900000); // رقم طلب أطول
+            const date = new Date().toLocaleString('ar-OM', { timeZone: 'Asia/Muscat' }); // تنسيق التاريخ والوقت لعمان
+            
+            let message = `*فاتورة طلب جديدة - CupfulCanvas*\n`;
+            message += `------------------------------\n`;
+            message += `*رقم الطلب:* #${orderNumber}\n`;
+            message += `*التاريخ والوقت:* ${date}\n`;
+            message += `*العميل:* ${name}\n`;
+            message += `*الموقع/الطاولة:* ${address}\n`;
+            message += `------------------------------\n`;
+            message += `*الطلبات:*\n`;
+
+            let total = 0;
+            cart.forEach((item, index) => {
+                const itemTotal = item.price * item.quantity;
+                message += `${index + 1}. ${item.name} (x${item.quantity}) - ${itemTotal.toFixed(2)} OMR\n`;
+                total += itemTotal;
+            });
+
+            message += `------------------------------\n`;
+            message += `*المجموع الكلي: ${total.toFixed(2)} OMR*\n`;
+            message += `------------------------------\n`;
+            message += `🚀 يرجى تأكيد استلام الطلب وبدء التحضير.`;
+
+          // --- إرسال للواتساب (تم إصلاح الرابط هنا) ---
+
+
+                    /*   
+
+	      const phoneNumber = "xxxxxxxxxx"; 
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappURL = "https://api.whatsapp.com/send?phone=" + phoneNumber + "&text=" + encodedMessage;
+
+
+
+            // فتح الواتساب في نافذة جديدة
+            window.location.href = whatsappURL;
+
+
+         */
+
+
+        }
+
+        // تشغيل ملخص السلة فور فتح الصفحة
+        loadSummary();
+
+
+      
+ </script>
+</body>
+</html>

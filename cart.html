@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CupfulCanvas | سلة التسوق</title>
+    <!-- ربط الخطوط من جوجل -->
+    <link href="https://fonts.googleapis.com" rel="stylesheet">
+    <!-- الأنماط الأساسية المضمنة -->
+    <style>
+        /* تعريف المتغيرات الأساسية (نفس المستخدمة في الصفحات الأخرى) */
+        :root {
+            --primary: #6f4e37; /* لون القهوة البني */
+            --secondary: #ff7e5f; /* لون برتقالي حيوي */
+            --text-color: #333;
+            --bg-color: #f8f8f2;
+            --card-bg: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            direction: rtl; /* دعم اللغة العربية من اليمين لليسار */
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .container {
+            max-width: 800px; /* جعل السلة أكثر تركيزاً */
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* تنسيق الهيدر (شريط التنقل) */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid #eee;
+            background-color: var(--card-bg);
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        nav a {
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        /* تنسيق الأزرار */
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #573d2a;
+        }
+
+        /* تنسيق قسم السلة */
+        .cart-section {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 30px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+        
+        .item-details {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .item-name {
+            font-weight: bold;
+        }
+
+        .item-quantity {
+            color: #777;
+        }
+
+        .item-price {
+            font-weight: bold;
+            color: var(--secondary);
+        }
+
+        .summary-section {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .total-price-display {
+            font-size: 1.5rem;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header class="container">
+        <a href="index.html" class="logo">CupfulCanvas</a>
+        <nav>
+            <a href="menu.html">العودة للقائمة</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <h2>سلة التسوق الخاصة بك</h2>
+        
+        <div id="cart-items" class="cart-section">
+            <!-- المنتجات ستظهر هنا برمجياً -->
+        </div>
+
+        <div class="summary-section">
+            <h3 class="total-price-display">
+                المجموع: <span id="total-price">0.00</span> ريال عماني
+            </h3>
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="location.href='checkout.html'">إتمام الطلب</button>
+                <button class="btn" style="background: #ff4444; color: white;" onclick="clearCart()">إفراغ السلة</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // الدالة الرئيسية لعرض محتويات السلة
+        function displayCart() {
+            const cartItemsDiv = document.getElementById('cart-items');
+            const totalSpan = document.getElementById('total-price');
+            // نستخدم نفس مفتاح localStorage الذي استخدمناه في صفحة المنيو
+            let cart = JSON.parse(localStorage.getItem('cupfulCanvasCart')) || [];
+            
+            if(cart.length === 0) {
+                cartItemsDiv.innerHTML = "<p style='text-align:center; padding:20px;'>السلة فارغة حالياً.</p>";
+                totalSpan.innerText = "0.00";
+                return;
+            }
+
+            let html = "";
+            let total = 0;
+            
+            cart.forEach((item, index) => {
+                const itemTotal = item.price * item.quantity;
+                html += `
+                    <div class="cart-item">
+                        <div class="item-details">
+                            <span class="item-name">${item.name}</span>
+                            <span class="item-quantity"> (الكمية: ${item.quantity})</span>
+                        </div>
+                        <span class="item-price">${itemTotal.toFixed(2)} ريال عماني</span>
+                    </div>
+                `;
+                total += itemTotal;
+            });
+
+            cartItemsDiv.innerHTML = html;
+            // تنسيق المجموع الكلي برقمين عشريين ليتناسب مع الريال العماني
+            totalSpan.innerText = total.toFixed(2); 
+        }
+
+        // دالة إفراغ السلة
+        function clearCart() {
+            // نستخدم نفس مفتاح localStorage
+            localStorage.removeItem('cupfulCanvasCart');
+            // تحديث العرض بعد الإفراغ
+            displayCart();
+            alert("تم إفراغ السلة بنجاح!");
+        }
+
+        // تشغيل الدالة عند تحميل الصفحة للتأكد من عرض السلة
+        document.addEventListener('DOMContentLoaded', (event) => {
+            displayCart();
+        });
+    </script>
+</body>
+</html>
